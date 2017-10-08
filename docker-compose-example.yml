@@ -1,0 +1,11 @@
+version: '2'
+services:
+  vimbadmin:
+    image: bytecast-de/docker-vimbadmin
+    hostname: "webmail.domain.com"
+    ports:
+      - '80:80'
+    environment:
+      - APPLICATION_ENV=production
+      - MYSQL_PASSWORD=XXX
+      - ADMIN_EMAIL=info@domain.com
