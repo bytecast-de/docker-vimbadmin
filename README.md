@@ -1,5 +1,7 @@
 # docker-vimbadmin
 
-vimbadmin container for email service
+Standalone apache / php5.6 container running on port 80, running fully installed and configured vimbadmin (https://www.vimbadmin.net/)
 
-Check [email](https://github.com/indiehosters/email) service to see how to use it.
+Based on https://github.com/indiehosters/docker-vimbadmin
+
+See docker-compose.yml for more information about how to use it.

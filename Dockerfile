@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:5.6-apache
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
@@ -45,12 +45,17 @@ RUN cd /tmp \
  && patch $INSTALL_PATH/application/views/mailbox/email/settings.phtml < /patch \
  && rm /patch
 
+RUN a2enmod rewrite
+
 WORKDIR /var/www/html
 VOLUME /var/www/html
 COPY mail.mobileconfig.php /var/www/html/public/mail.mobileconfig.php
 COPY mozilla-autoconfig.xml /var/www/html/public/mail/config-v1.1.xml
 COPY docker-entrypoint.sh /entrypoint.sh
+COPY apache-vhost.conf /etc/apache2/sites-enabled/000-default.conf
 COPY application.ini /var/www/html/application/configs/application.ini
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["php-fpm"]
+
+EXPOSE 80
+CMD ["apache2-foreground"]
