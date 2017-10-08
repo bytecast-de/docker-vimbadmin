@@ -16,5 +16,19 @@ sed -i "s/\/vimbadmin//g"  ${INSTALL_PATH}/public/.htaccess
 # copy default configuration
 cp ${INSTALL_PATH}/application/configs/application.ini.dist ${INSTALL_PATH}/application/configs/application.ini
 
-# FIXME: setup salts!
-#cat /salts >> ${INSTALL_PATH}/application/configs/application.ini
+# setup salts
+APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini
+
+# set random rememberme salt
+SALT=`</dev/urandom tr -dc 'A-Za-z0-9!#%()*+,-./:;<>?@[\]^_{|}~' | head -c 64  ; echo`
+sed -i "/resources.auth.oss.rememberme.salt/d" ${APP_CONFIG}
+sed -i "/\[user\]/a resources.auth.oss.rememberme.salt = '${SALT}'" ${APP_CONFIG}
+
+# set crypt default
+sed -i "/defaults.mailbox.password_scheme/d" ${APP_CONFIG}
+sed -i "/\[user\]/a defaults.mailbox.password_scheme = 'crypt:sha512'" ${APP_CONFIG}
+
+# turn off errors for production
+sed -i "s/startup_errors = 1/startup_errors = 0/" ${APP_CONFIG} 
+sed -i "s/display_errors = 1/display_errors = 0/" ${APP_CONFIG} 
+sed -i "s/displayExceptions = 1/displayExceptions = 0/" ${APP_CONFIG} 

@@ -1,4 +1,4 @@
-#!/bin/bash -eux
+#!/bin/bash -ex
 
 sed -i "s/PRIMARY_HOSTNAME/${HOSTNAME}/g"  /var/www/html/public/mail/config-v1.1.xml
 sed -i "s/PRIMARY_HOSTNAME/${HOSTNAME}/g"  /var/www/html/public/mail.mobileconfig.php
@@ -12,7 +12,11 @@ sed -i "/\[user\]/a resources.doctrine2.connection.options.password = '${MYSQL_P
 sed -i "/resources.doctrine2.connection.options.host/d" ${APP_CONFIG}
 sed -i "/\[user\]/a resources.doctrine2.connection.options.host = 'db'" ${APP_CONFIG}
 
-# TODO: admin email?
+sed -i "/defaults.mailbox.password_salt/d" ${APP_CONFIG}
+sed -i "/\[user\]/a resources.doctrine2.connection.options.host = '${SALT_MAILBOX}'" ${APP_CONFIG}
+
+sed -i "/securitysalt/d" ${APP_CONFIG}
+sed -i "/\[user\]/a securitysalt = '${SALT_SECURITY}'" ${APP_CONFIG}
 
 # first arg is `-f` or `--some-option`
 if [ "${1#-}" != "$1" ]; then
@@ -28,11 +32,16 @@ do
           table_schema='vimbadmin' and table_name='domain';") -eq 1 ]; then
         exec "$@"
       else
-        echo "Creating DB and Superuser"
-        HASH_PASS=`php -r "echo password_hash('${ADMIN_PASSWORD}', PASSWORD_DEFAULT);"`
+        echo "Creating DB"
         ./bin/doctrine2-cli.php orm:schema-tool:create
-        mysql -u vimbadmin -p${MYSQL_PASSWORD} -h db vimbadmin -e \
-          "INSERT INTO admin (username, password, super, active, created, modified) VALUES ('${ADMIN_EMAIL}', '$HASH_PASS', 1, 1, NOW(), NOW())" && \
+
+        if [ -n "${ADMIN_EMAIL}" ] && [ -n "${ADMIN_PASSWORD}" ]; then
+          echo "Creating Superuser"
+          HASH_PASS=`php -r "echo password_hash('${ADMIN_PASSWORD}', PASSWORD_DEFAULT);"`
+          mysql -u vimbadmin -p${MYSQL_PASSWORD} -h db vimbadmin -e \
+            "INSERT INTO admin (username, password, super, active, created, modified) VALUES ('${ADMIN_EMAIL}', '$HASH_PASS', 1, 1, NOW(), NOW())"
+        fi
+
         echo "Vimbadmin setup completed successfully"
         exec "$@"
       fi

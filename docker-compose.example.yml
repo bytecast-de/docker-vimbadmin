@@ -10,6 +10,8 @@ services:
       - MYSQL_PASSWORD=XXX
       - ADMIN_EMAIL=info@domain.com
       - ADMIN_PASSWORD=XXX2
+      - SALT_MAILBOX=REPLACE_WITH_64_CHAR_RANDOM_STRING
+      - SALT_SECURITY=REPLACE_WITH_ANOTHER_64_CHAR_RANDOM_STRING
     links:
       - db
   db:

@@ -20,5 +20,4 @@ FLUSH PRIVILEGES;
  * See docker-compose.example.yml for more information about mandatory environment variables and how to use.
 
 ## TODOs
- * setup / configure salts via environment
  * memcached
