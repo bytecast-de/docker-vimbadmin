@@ -5,23 +5,21 @@ sed -i "s/PRIMARY_HOSTNAME/${HOSTNAME}/g"  /var/www/html/public/mail.mobileconfi
 sed -i "s/UUID2/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 sed -i "s/UUID4/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 
-echo >&2 "Setting Permissions:"
-path='/var/www/html'
-htuser='www-data'
+APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini
+sed -i "/resources.doctrine2.connection.options.password/d" ${APP_CONFIG}
+sed -i "/\[user\]/a resources.doctrine2.connection.options.password = '${MYSQL_PASSWORD}'" ${APP_CONFIG}
 
-chown -R root:${htuser} ${path}/
-chown -R ${htuser}:${htuser} ${path}/*
+sed -i "/resources.doctrine2.connection.options.host/d" ${APP_CONFIG}
+sed -i "/\[user\]/a resources.doctrine2.connection.options.host = 'db'" ${APP_CONFIG}
 
-cp ${INSTALL_PATH}/public/.htaccess.dist ${INSTALL_PATH}/public/.htaccess
-sed -i "s/\/vimbadmin//g"  ${INSTALL_PATH}/public/.htaccess
+# TODO: admin email?
 
-sed -i "s/MYSQL_PASSWORD/${MYSQL_PASSWORD}/g" ${INSTALL_PATH}/application/configs/application.ini
-sed -i "s/HOSTNAME/${HOSTNAME}/g" ${INSTALL_PATH}/application/configs/application.ini
-sed -i "s/ADMIN_EMAIL/${ADMIN_EMAIL}/g" ${INSTALL_PATH}/application/configs/application.ini
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- apache2-foreground "$@"
+fi
 
-#cat /salts >> ${INSTALL_PATH}/application/configs/application.ini
-
-for ((i=0;i<1;i++))
+for ((i=0;i<3;i++))
 do
     DB_CONNECTABLE=$(mysql -uvimbadmin -p${MYSQL_PASSWORD} -hdb -P3306 -e 'status' >/dev/null 2>&1; echo "$?")
     if [[ DB_CONNECTABLE -eq 0 ]]; then
@@ -42,9 +40,4 @@ do
     sleep 5
 done
 
-# first arg is `-f` or `--some-option`
-if [ "${1#-}" != "$1" ]; then
-	set -- apache2-foreground "$@"
-fi
-
-exec "$@"
+exit 1

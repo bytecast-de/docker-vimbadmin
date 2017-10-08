@@ -47,15 +47,15 @@ RUN cd /tmp \
 
 RUN a2enmod rewrite
 
-WORKDIR /var/www/html
-VOLUME /var/www/html
+COPY setup.sh /tmp/setup.sh
+RUN /tmp/setup.sh
+
 COPY mail.mobileconfig.php /var/www/html/public/mail.mobileconfig.php
 COPY mozilla-autoconfig.xml /var/www/html/public/mail/config-v1.1.xml
-COPY docker-entrypoint.sh /entrypoint.sh
+COPY docker-entrypoint.sh /tmp/entrypoint.sh
 COPY apache-vhost.conf /etc/apache2/sites-enabled/000-default.conf
-COPY application.ini /var/www/html/application/configs/application.ini
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/tmp/entrypoint.sh"]
 
 EXPOSE 80
 CMD ["apache2-foreground"]

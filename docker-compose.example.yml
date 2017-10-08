@@ -9,3 +9,10 @@ services:
       - APPLICATION_ENV=production
       - MYSQL_PASSWORD=XXX
       - ADMIN_EMAIL=info@domain.com
+      - ADMIN_PASSWORD=XXX2
+    links:
+      - db
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: XXX3
