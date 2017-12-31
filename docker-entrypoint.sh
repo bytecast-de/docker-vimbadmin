@@ -5,7 +5,7 @@ sed -i "s/PRIMARY_HOSTNAME/${HOSTNAME}/g"  /var/www/html/public/mail.mobileconfi
 sed -i "s/UUID2/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 sed -i "s/UUID4/$(cat /proc/sys/kernel/random/uuid)/g"  /var/www/html/public/mail.mobileconfig.php
 
-APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini
+APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini.base
 sed -i "/resources.doctrine2.connection.options.password/d" ${APP_CONFIG}
 sed -i "/\[user\]/a resources.doctrine2.connection.options.password = '${MYSQL_PASSWORD}'" ${APP_CONFIG}
 
@@ -17,6 +17,15 @@ sed -i "/\[user\]/a resources.doctrine2.connection.options.host = '${SALT_MAILBO
 
 sed -i "/securitysalt/d" ${APP_CONFIG}
 sed -i "/\[user\]/a securitysalt = '${SALT_SECURITY}'" ${APP_CONFIG}
+
+APP_CONFIG_INI=${INSTALL_PATH}/application/configs/application.ini
+cp $APP_CONFIG $APP_CONFIG_INI
+
+
+# append custom config
+if [ -f /tmp/docker-vimbadmin/application.ini ]; then
+  cat /tmp/docker-vimbadmin/application.ini >> $APP_CONFIG_INI
+fi
 
 # first arg is `-f` or `--some-option`
 if [ "${1#-}" != "$1" ]; then

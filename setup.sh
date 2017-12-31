@@ -14,10 +14,10 @@ cp ${INSTALL_PATH}/public/.htaccess.dist ${INSTALL_PATH}/public/.htaccess
 sed -i "s/\/vimbadmin//g"  ${INSTALL_PATH}/public/.htaccess
 
 # copy default configuration
-cp ${INSTALL_PATH}/application/configs/application.ini.dist ${INSTALL_PATH}/application/configs/application.ini
+cp ${INSTALL_PATH}/application/configs/application.ini.dist ${INSTALL_PATH}/application/configs/application.ini.base
 
 # setup salts
-APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini
+APP_CONFIG=${INSTALL_PATH}/application/configs/application.ini.base
 
 # set random rememberme salt
 SALT=`</dev/urandom tr -dc 'A-Za-z0-9!#%()*+,-./:;<>?@[\]^_{|}~' | head -c 64  ; echo`
