@@ -12,6 +12,7 @@ chown -R ${htuser}:${htuser} ${path}/var
 # copy .htaccess, remove default subpath /vimbadmin as we want to run directly on / on our own vhost
 cp ${INSTALL_PATH}/public/.htaccess.dist ${INSTALL_PATH}/public/.htaccess
 sed -i "s/\/vimbadmin//g"  ${INSTALL_PATH}/public/.htaccess
+sed -i "s/SetEnv APPLICATION_ENV production/SetEnv APPLICATION_ENV docker/" ${INSTALL_PATH}/public/.htaccess
 
 # copy default configuration
 cp ${INSTALL_PATH}/application/configs/application.ini.dist ${INSTALL_PATH}/application/configs/application.ini.base
@@ -32,3 +33,5 @@ sed -i "/\[user\]/a defaults.mailbox.password_scheme = 'crypt:sha512'" ${APP_CON
 sed -i "s/startup_errors = 1/startup_errors = 0/" ${APP_CONFIG} 
 sed -i "s/display_errors = 1/display_errors = 0/" ${APP_CONFIG} 
 sed -i "s/displayExceptions = 1/displayExceptions = 0/" ${APP_CONFIG} 
+
+printf "\n\n[docker : production]\n\n" >> ${APP_CONFIG}
